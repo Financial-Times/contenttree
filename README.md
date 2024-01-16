@@ -515,6 +515,52 @@ interface BigNumber extends Node {
 
 **BigNumber** represents a big number.
 
+### `Clip`
+
+#### `ClipSet`
+
+```ts
+interface ClipSet extends Node {
+  type: "clip-set"
+  id: string
+  autoplay: boolean
+  loop: boolean
+  muted: boolean
+  dataLayout: string
+  external noAudio: boolean
+  external caption: string
+  external credits: string
+  external description: string
+  external displayTitle: string
+  external subtitle: string
+  external clips: Clip[]
+}
+```
+
+```ts
+type Clip {
+  id: string
+  format: string
+  dataSource: ClipSource[]
+  poster: string
+}
+```
+
+```ts
+type ClipSource {
+  audioCodec: string
+  binaryUrl: string
+  duration: number
+  mediaType: string
+  pixelHeight: number
+  pixelWidth: number
+  videoCodec: string
+}
+```
+
+**ClipSet** represents a short piece of possibly-looping video content for an article.
+
+
 ### `Video`
 
 ```ts
@@ -527,7 +573,6 @@ interface Video extends Node {
 
 **Video** represents for an FT video referenced by a URL.
 
-TODO: Figure out how Clips work, how they are different?
 
 ### `YoutubeVideo`
 

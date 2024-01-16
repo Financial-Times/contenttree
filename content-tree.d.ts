@@ -163,6 +163,36 @@ export declare namespace ContentTree {
         number: string;
         description: string;
     }
+    interface ClipSet extends Node {
+        type: "clip-set";
+        id: string;
+        autoplay: boolean;
+        loop: boolean;
+        muted: boolean;
+        dataLayout: string;
+        noAudio: boolean;
+        caption: string;
+        credits: string;
+        description: string;
+        displayTitle: string;
+        subtitle: string;
+        clips: Clip[];
+    }
+    type Clip = {
+        id: string;
+        format: string;
+        dataSource: ClipSource[];
+        poster: string;
+    };
+    type ClipSource = {
+        audioCodec: string;
+        binaryUrl: string;
+        duration: number;
+        mediaType: string;
+        pixelHeight: number;
+        pixelWidth: number;
+        videoCodec: string;
+    };
     interface Video extends Node {
         type: "video";
         id: string;
@@ -418,6 +448,36 @@ export declare namespace ContentTree {
             number: string;
             description: string;
         }
+        interface ClipSet extends Node {
+            type: "clip-set";
+            id: string;
+            autoplay: boolean;
+            loop: boolean;
+            muted: boolean;
+            dataLayout: string;
+            noAudio: boolean;
+            caption: string;
+            credits: string;
+            description: string;
+            displayTitle: string;
+            subtitle: string;
+            clips: Clip[];
+        }
+        type Clip = {
+            id: string;
+            format: string;
+            dataSource: ClipSource[];
+            poster: string;
+        };
+        type ClipSource = {
+            audioCodec: string;
+            binaryUrl: string;
+            duration: number;
+            mediaType: string;
+            pixelHeight: number;
+            pixelWidth: number;
+            videoCodec: string;
+        };
         interface Video extends Node {
             type: "video";
             id: string;
@@ -671,6 +731,29 @@ export declare namespace ContentTree {
             number: string;
             description: string;
         }
+        interface ClipSet extends Node {
+            type: "clip-set";
+            id: string;
+            autoplay: boolean;
+            loop: boolean;
+            muted: boolean;
+            dataLayout: string;
+        }
+        type Clip = {
+            id: string;
+            format: string;
+            dataSource: ClipSource[];
+            poster: string;
+        };
+        type ClipSource = {
+            audioCodec: string;
+            binaryUrl: string;
+            duration: number;
+            mediaType: string;
+            pixelHeight: number;
+            pixelWidth: number;
+            videoCodec: string;
+        };
         interface Video extends Node {
             type: "video";
             id: string;

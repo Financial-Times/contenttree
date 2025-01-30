@@ -1,11 +1,17 @@
-import fromBodyXML from "./index.js";
 import assert from "node:assert";
+import fromBodyXML from "./index.js";
 import Ajv from "ajv";
 import fs from "node:fs";
 import path from "node:path";
+import test from "node:test";
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const transitTreeSchemaFile = fs.readFileSync(
-  path.resolve("../../schemas/transit-tree.schema.json")
+  path.resolve(__dirname, "../../schemas/transit-tree.schema.json")
 );
 
 const transitTreeSchema = JSON.parse(transitTreeSchemaFile);
@@ -33,9 +39,10 @@ function getValueAtInstancePath(obj, instancePath) {
 }
 
 async function getNotifications() {
-  const sixHoursAgo = new Date(Date.now() - 6 * 3 * 60 * 1000).toISOString();
-  const url = `https://api-t.ft.com/content/notifications?since=${encodeURIComponent(
-    sixHoursAgo
+  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+
+  const url = `${process.env.CONTENT_API_HOST}/content/notifications?since=${encodeURIComponent(
+    oneHourAgo
   )}`;
 
   try {
@@ -91,30 +98,29 @@ const notifications = await getNotifications();
 
 const apiUrls = getLatestContentURLs(notifications);
 
-function validateTransitTree(tree) {}
 
 for (let apiUrl of apiUrls) {
-  console.log("Validating ", apiUrl.split("/").pop());
-  const article = await fetchArticleFromCAPI(apiUrl);
+  test("Validating " + apiUrl.split("/").pop(), async (t) => {
+    const article = await fetchArticleFromCAPI(apiUrl);
+    if (!article.bodyXML) {
+      console.log("No bodyXML");
+      t.skip('Skipping - no bodyXML')
+      return;
+    }
 
-  if (!article.bodyXML) {
-    console.log("No bodyXML");
-    continue;
-  }
+    const bodyTree = fromBodyXML(article.bodyXML);
+    const isValid = validate(bodyTree);
+    // Add the erroneous value to the error message, for debugging
+    if (!isValid) {
+      validate.errors.forEach(
+        (error) =>
+          (error.instanceValue = getValueAtInstancePath(
+            bodyTree,
+            error.instancePath
+          ))
+      );
+    }
+    assert.ok(isValid, `Transit tree is invalid: ${JSON.stringify(validate.errors, null, 2)}`);
+  });
 
-  const bodyTree = fromBodyXML(article.bodyXML);
-  console.log(bodyTree);
-
-  const isValid = validate(bodyTree);
-  if (!isValid) {
-    validate.errors.forEach(
-      (error) =>
-        (error.instanceValue = getValueAtInstancePath(
-          bodyTree,
-          error.instancePath
-        ))
-    );
-    console.log(validate.errors);
-  }
-  console.log({ isValid });
 }

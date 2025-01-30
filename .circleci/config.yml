@@ -1,0 +1,52 @@
+version: 2.1
+
+orbs:
+    doppler-circleci: ft-circleci-orbs/doppler-circleci@1.4
+
+references:
+  default_container_config: &default_container_config
+    docker:
+      - image: cimg/node:lts
+
+jobs:
+  smoke-test:
+    <<: *default_container_config
+    steps:
+      - checkout
+      - doppler-circleci/install
+      - doppler-circleci/load_secrets
+      - run:
+          name: Install dependencies
+          command: npm install
+      - run:
+          name: Validate fromBodyXml against recent articles
+          command: |
+            mkdir -p ./reports
+            touch ./reports/test-report.txt
+            node --test-reporter=tap --test-reporter-destination=./reports/test-report.txt --test-reporter=spec --test-reporter-destination=stdout --test libraries/from-bodyxml/smoke-test.js
+      - run:
+          name: Store test results and artifacts
+          command:  |
+            cat ./reports/test-report.txt | npx tap-xunit > ./reports/test-report.xml
+            exit 0
+          when: always
+      - store_test_results:
+          path: ./reports
+      - store_artifacts:
+          path: ./reports
+
+workflows:
+  version: 2
+  hourly:
+    triggers:
+      - schedule:
+          cron: "5 * * * *"
+          filters:
+            branches:
+              only:
+                - from-bodyxml-validation
+    jobs:
+      - smoke-test
+  main:
+    jobs:
+      - smoke-test

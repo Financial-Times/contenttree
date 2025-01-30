@@ -5,7 +5,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node test.js"
+    "test": "node test.js",
+    "test:smoke": "node smoke-test.js"
   },
   "keywords": [],
   "author": "",
